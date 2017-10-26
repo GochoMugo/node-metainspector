@@ -1,9 +1,11 @@
 var util = require('util'),
-	request = require('request'),
+	//request = require('request'),
 	events = require('events'),
 	cheerio = require('cheerio-without-node-native'),
 	URI = require('uri-js'),
+	got = require('got'),
 	_ = require('lodash');
+
 
 var debug;
 
@@ -302,7 +304,22 @@ MetaInspector.prototype.getAbsolutePath = function(href){
 
 MetaInspector.prototype.fetch = function(){
 	var _this = this;
-	var totalChunks = 0;
+
+	got(this.url)
+		.then(response => {
+			_this.document = body;
+			_this.parsedDocument = cheerio.load(body);
+			_this.response = response;
+
+			_this.initAllProperties();
+
+			_this.emit("fetch");
+		})
+		.catch( err => {
+			_this.emit("error", error);
+		});
+
+	/*
 	var r = request(_.assign({uri : this.url, gzip: true}, this.options), function(error, response, body){
 		if(!error && response.statusCode === 200){
 			_this.document = body;
@@ -317,18 +334,6 @@ MetaInspector.prototype.fetch = function(){
 			_this.emit("error", error);
 		}
 	});
+	*/
 
-	if(_this.options.limit){
-		_this.__stoppedAtLimit = false;
-		r.on('data', function(chunk){
-			totalChunks += chunk.length;
-			if(totalChunks > _this.options.limit){
-				if(!_this.__stoppedAtLimit) {
-					_this.emit("limit");
-					_this.__stoppedAtLimit = true;
-				}
-				r.abort();
-			}
-		});
-	}
 };
