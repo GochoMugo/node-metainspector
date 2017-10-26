@@ -4,3 +4,11 @@ node_modules
 build
 *.node
 components
+
+# Android/IntelliJ
+#
+build/
+.idea
+.gradle
+local.properties
+*.iml

@@ -1,7 +1,7 @@
 var util = require('util'),
 	request = require('request'),
 	events = require('events'),
-	cheerio = require('cheerio'),
+	cheerio = require('cheerio-without-node-native'),
 	URI = require('uri-js'),
 	_ = require('lodash');
 
