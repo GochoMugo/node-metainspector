@@ -294,31 +294,44 @@ MetaInspector.prototype.getAbsolutePath = function(href){
 	return this.rootUrl + href;
 };
 
-MetaInspector.prototype.fetch = function(){
-	var _this = this;
+/**
+ * The fetch optionally takes a Promise that eventually returns some markup.
+ * This enables you to use any other external API to fetch your resource,
+ * not tying you down to `XMLHttpRequest`. With this approach, you could
+ * even parse in local markup.
+ * @returns {Promise.<T>}
+ */
+MetaInspector.prototype.fetch = function(optionalResolver){
+	let _this = this;
 
-	return new Promise((resolve, reject) => {
-		var request = new XMLHttpRequest();
+	const defaultResolver = new Promise((resolve, reject) => {
+		let request = new XMLHttpRequest();
 		request.onreadystatechange = (e) => {
-		if (request.readyState !== 4) {
-			return;
-		}
-		if (request.status === 200) {
-			console.log("LINK GET: RESPONSE => ");
-			return resolve(request.responseText);
-		} else {
-			reject(request);
-		}
-	};
-	request.open('GET', this.url);
-	request.send();
-}).then(response => {
-	_this.document = response;
-	_this.parsedDocument = cheerio.load(response);
+			if (request.readyState !== 4) {
+				return;
+			}
+			if (request.status === 200) {
+				console.log("LINK GET: RESPONSE => ");
+				console.log(request.responseText);
+				return resolve(request.responseText);
+			} else {
+				reject(request);
+			}
+		};
+		request.open('GET', this.url);
+		request.setRequestHeader('Accept','text/html');
+		request.send();
+	});
 
-	_this.initAllProperties();
+	let markupResolver = (optionalResolver === null) || (typeof optionalResolver === 'undefined') ?
+		defaultResolver : optionalResolver;
 
-	return this;
-});
+	return markupResolver
+		.then(response => {
+			_this.document = response;
+			_this.parsedDocument = cheerio.load(response);
+			_this.initAllProperties();
+			return this;
+	});
 
 };
