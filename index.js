@@ -333,5 +333,4 @@ MetaInspector.prototype.fetch = function(optionalResolver){
 			_this.initAllProperties();
 			return this;
 	});
-
 };
