@@ -1,10 +1,12 @@
 ![status](https://secure.travis-ci.org/gabceb/node-metainspector.png?branch=master)
 
-## Node-Metainspector
+## React-Native-Metainspector
 
 MetaInspector is an npm package for web scraping purposes. You give it an URL, and it lets you easily get its title, links, images, description, keywords, meta tags....
 
 Metainspector is inspired by the Metainspector gem by [jaimeiniesta](https://github.com/jaimeiniesta/metainspector)
+
+React-Native-Metainspector is a fork of node-metainspector, making the library browser friendly.
 
 ### Scraped data
 

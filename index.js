@@ -1,20 +1,15 @@
 var util = require('util'),
-	//request = require('request'),
-	events = require('events'),
 	cheerio = require('cheerio-without-node-native'),
-	URI = require('uri-js'),
-	got = require('got'),
-	_ = require('lodash');
-
+	URI = require('uri-js');
 
 var debug;
 
 if (/\bmetainspector\b/.test(process.env.NODE_DEBUG)) {
-  debug = function() {
-    console.error('METAINSPECTOR %s', util.format.apply(util, arguments));
-  };
+	debug = function() {
+		console.error('METAINSPECTOR %s', util.format.apply(util, arguments));
+	};
 } else {
-  debug = function() {};
+	debug = function() {};
 }
 
 function withDefaultScheme(url){
@@ -42,9 +37,6 @@ var MetaInspector = function(url, options){
 
 	this.options.headers = this.options.headers || {'User-Agent' : 'MetaInspector/1.0'};
 };
-
-//MetaInspector.prototype = new events.EventEmitter();
-MetaInspector.prototype.__proto__ = events.EventEmitter.prototype;
 
 module.exports = MetaInspector;
 
@@ -281,19 +273,19 @@ MetaInspector.prototype.initAllProperties = function()
 {
 	// title of the page, as string
 	this.getTitle()
-			.getAuthor()
-			.getCharset()
-			.getKeywords()
-			.getLinks()
-			.getDescription()
-			.getImage()
-			.getImages()
-			.getFeeds()
-			.getOgTitle()
-			.getOgDescription()
-			.getOgType()
-			.getOgUpdatedTime()
-			.getOgLocale();
+		.getAuthor()
+		.getCharset()
+		.getKeywords()
+		.getLinks()
+		.getDescription()
+		.getImage()
+		.getImages()
+		.getFeeds()
+		.getOgTitle()
+		.getOgDescription()
+		.getOgType()
+		.getOgUpdatedTime()
+		.getOgLocale();
 }
 
 MetaInspector.prototype.getAbsolutePath = function(href){
@@ -305,35 +297,28 @@ MetaInspector.prototype.getAbsolutePath = function(href){
 MetaInspector.prototype.fetch = function(){
 	var _this = this;
 
-	got(this.url)
-		.then(response => {
-			_this.document = body;
-			_this.parsedDocument = cheerio.load(body);
-			_this.response = response;
-
-			_this.initAllProperties();
-
-			_this.emit("fetch");
-		})
-		.catch( err => {
-			_this.emit("error", error);
-		});
-
-	/*
-	var r = request(_.assign({uri : this.url, gzip: true}, this.options), function(error, response, body){
-		if(!error && response.statusCode === 200){
-			_this.document = body;
-			_this.parsedDocument = cheerio.load(body);
-			_this.response = response;
-
-			_this.initAllProperties();
-
-			_this.emit("fetch");
+	return new Promise((resolve, reject) => {
+		var request = new XMLHttpRequest();
+		request.onreadystatechange = (e) => {
+		if (request.readyState !== 4) {
+			return;
 		}
-		else{
-			_this.emit("error", error);
+		if (request.status === 200) {
+			console.log("LINK GET: RESPONSE => ");
+			return resolve(request.responseText);
+		} else {
+			reject(request);
 		}
-	});
-	*/
+	};
+	request.open('GET', this.url);
+	request.send();
+}).then(response => {
+	_this.document = response;
+	_this.parsedDocument = cheerio.load(response);
+
+	_this.initAllProperties();
+
+	return this;
+});
 
 };
