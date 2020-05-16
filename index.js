@@ -1,16 +1,8 @@
-var util = require('util'),
-	cheerio = require('cheerio-without-node-native'),
+var cheerio = require('cheerio-without-node-native'),
 	URI = require('uri-js');
 
-var debug;
+var debug = function() {};
 
-if (/\bmetainspector\b/.test(process.env.NODE_DEBUG)) {
-	debug = function() {
-		console.error('METAINSPECTOR %s', util.format.apply(util, arguments));
-	};
-} else {
-	debug = function() {};
-}
 
 function withDefaultScheme(url){
 	return URI.parse(url).scheme ? url : "http://" + url;
